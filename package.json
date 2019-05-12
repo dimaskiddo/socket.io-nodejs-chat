@@ -4,8 +4,7 @@
   "description": "NodeJS Socket.IO Chat Application",
   "main": "server.js",
   "scripts": {
-    "server": "node server.js",
-    "client": "node client.js"
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
