@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <title>NodeJS Socket.IO Chat</title>
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="/socket.io/chat/socket.io.js"></script>
+    <script>
+      $(function() {
+        const socket = io.connect("http://localhost:3000/socket.io/chat", {"path": "/socket.io/chat"})
+        
+        socket.on('welcome', function(data) {
+          console.log(data)
+        })
+      })
+    </script>
+  </head>
+
+  <body>
+
+  </body>
+</html>

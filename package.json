@@ -1,0 +1,31 @@
+{
+  "name": "socket.io-nodejs-chat",
+  "version": "1.0.0",
+  "description": "NodeJS Socket.IO Chat Application",
+  "main": "server.js",
+  "scripts": {
+    "server": "node server.js",
+    "client": "node client.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dimaskiddo/socket.io-nodejs-chat.git"
+  },
+  "keywords": [
+    "NodeJS",
+    "Socket.IO",
+    "Chat",
+    "Application"
+  ],
+  "author": "Dimas Restu Hidayanto",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dimaskiddo/socket.io-nodejs-chat/issues"
+  },
+  "homepage": "https://github.com/dimaskiddo/socket.io-nodejs-chat#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "helmet": "^3.18.0",
+    "socket.io": "^2.2.0"
+  }
+}
