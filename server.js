@@ -14,11 +14,6 @@ const io = require('socket.io')(server, {
 // Middleware
 app.use(helmet())
 
-app.use(express.urlencoded({ 
-  extended: false,
-  limit: '8mb'
-}))
-
 app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*')
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
@@ -30,7 +25,7 @@ app.use(function (req, res, next) {
 // -------------------------------------------------
 // Routes
 app.get('/', function(req, res) {
-  res.sendFile(__dirname + "/index.html")
+  res.sendFile(__dirname + '/public/index.html')
 })
 // -------------------------------------------------
 
@@ -41,10 +36,10 @@ socketUsers = []
 
 io.of('/socket.io/chat').on("connection", function(socket) {
   socketConns.push(socket)
-  console.log('Connected: %s sockets connected', socketConns.length)
+  console.log('Connected: %s Sockets Connected', socketConns.length)
 
   // Welcome
-  socket.emit('welcome', "Welcome to /socket.io/chat Namespace")
+  socket.emit('welcome', 'Welcome to /socket.io/chat Namespace')
 
   // New User
   socket.on('new-user', function(data) {
@@ -99,7 +94,7 @@ io.of('/socket.io/chat').on("connection", function(socket) {
     }
 
     socketConns.splice(socketConns.indexOf(socket), 1)
-    console.log('Connected: %s sockets connected', socketConns.length)
+    console.log('Connected: %s Sockets Connected', socketConns.length)
   })
 })
 // -------------------------------------------------
