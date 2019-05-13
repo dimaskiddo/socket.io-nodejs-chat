@@ -32,7 +32,6 @@ app.get('/', function(req, res) {
 // -------------------------------------------------
 // Sockets
 socketConns = []
-socketUsers = []
 
 io.of('/socket.io/chat').on("connection", function(socket) {
   socketConns.push(socket)
@@ -41,58 +40,46 @@ io.of('/socket.io/chat').on("connection", function(socket) {
   // Welcome
   socket.emit('welcome', 'Welcome to /socket.io/chat Namespace')
 
-  // New User
-  socket.on('new-user', function(data) {
-    // Set Username
-    socket.username = data
-    socketUser.push(data)
-  })
-
   // Join Room
-  socket.on('join-room', function(data) {
-    socket.join(data)
-
-    // Broadcast Message to Room
-    io.of('/socket.io/chat').to(data).emit('get-message', 'User '+socket.username+' Has Joined The Room')
+  socket.on('join-room', function(room) {
+    socket.join(room)
 
     // Return Message to Namespace
-    socket.emit('success', 'You are Joined to Room: ' + data)
+    socket.emit('success', 'You are joined to room: ' + room)
   })
 
   // New Message
-  socket.on('new-message', function(data) {
-    // Check If Room Data is Set
-    // If Not Set then Send Error Message
-    if (data.room !== undefined) {
-      return socket.emit('error', 'Error, You are Not Joined to Any Room. Can Not Sent Message.')
-    } else if (socket.room.indexOf(data.room) >= 0) {
-      // If Room Data is Exist in Joined Room then Send the Message
-      return io.of('/socket.io/chat').to(data.room).emit('get-message', data.message)
+  socket.on('new-message', function(room, message, result) {
+    // Check If Room Data is Defined
+    if (room === undefined) {
+      // If Room is Undefined Then Send Error Message
+      result(false)
+      return socket.emit('failed', 'Error, no room defined to send message')
     }
 
-    // Send Error Message, If Not Yet Joined to The Rom
-    socket.emit('error', 'Error, You are Not Joined to Room ' + data.room + '. Can Not Sent Message to The Room.')
+    // Check If Socket Joined The Room
+    const roomIndex = Object.keys(socket.rooms).indexOf(room)
+    if (roomIndex > 0) {
+      // If Socket is Joined The Room Then
+      // Broadcast (Except Current Socket) Message to Room
+      result(true)
+      return socket.broadcast.to(room).emit('get-message', message)
+    }
+
+    result(false)
+    socket.emit('failed', 'Error, you are not joined to room ' + room)
   })
 
   // Leave Room
-  socket.on('leave-room', function(data) {
-    socket.leave(data)
-
-    // Broadcast Message to Room
-    io.of('/socket.io/chat').to(data).emit('get-message', 'User '+socket.username+' Has Leaving The Room')
+  socket.on('leave-room', function(room) {
+    socket.leave(room)
 
     // Return Message to Namespace
-    socket.emit('success', 'You are Leaving a Room: ' + data)
+    socket.emit('success', 'You are leaved from room: ' + room)
   })
 
   // Disconnect
   socket.on('disconnect', function(data) {
-    // Check if Username is Set
-    // If it's Set Then Remove it from Users
-    if (socket.username !== undefined) {
-      socketUsers.splice(socketUsers.indexOf(socket), 1)
-    }
-
     socketConns.splice(socketConns.indexOf(socket), 1)
     console.log('Connected: %s Sockets Connected', socketConns.length)
   })

@@ -1,20 +1,169 @@
 <html>
   <head>
     <title>NodeJS Socket.IO Chat</title>
-    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+
+    <script src="https://bootswatch.com/_vendor/jquery/dist/jquery.min.js"></script>
+    <script src="https://bootswatch.com/_vendor/popper.js/dist/umd/popper.min.js"></script>
+    <script src="https://bootswatch.com/_vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script>
+      // Auto Expand Text Area
+      var autoExpand = function(object) {
+        // Reset Object Height
+        object.style.height = 'inherit';
+        
+        // Get The Computed Styles for The Element
+        var computed = window.getComputedStyle(object);
+
+        // Calculate The Height
+        var height = parseInt(computed.getPropertyValue('border-top-width'), 10)
+                    + parseInt(computed.getPropertyValue('padding-top'), 10)
+                    + object.scrollHeight - 12
+                    + parseInt(computed.getPropertyValue('padding-bottom'), 10)
+                    + parseInt(computed.getPropertyValue('border-bottom-width'), 10);
+
+        object.style.height = height + 'px';
+      };
+      
+      // Add Input Listener to All Text Area for Auto Expand
+      document.addEventListener('input', function (event) {
+        if (event.target.tagName.toLowerCase() !== 'textarea') return;
+          autoExpand(event.target);
+      }, false);    
+    </script>
+
     <script src="/socket.io/chat/socket.io.js"></script>
     <script>
       $(function() {
-        const socket = io.connect("/socket.io/chat", {"path": "/socket.io/chat"})
+        // Connect to Socket
+        const socket = io.connect("/socket.io/chat", {"path": "/socket.io/chat"});
+
+        // Components
+        const chatWindow = $('#chatWindow');
+        const messageForm = $('#messageForm');
+        const messageText = $('#messageText');
+        const messageSend = $('#messageSend');
         
+        // Listen for Event 'success'
+        socket.on('success', function(data) {
+          // Log Success Message
+          console.log(data);
+        });
+
+        // Listen for Event 'failed'
+        socket.on('failed', function(data) {
+          // Alert Failed Message
+          alert(data);
+        });
+
+        // Listen for Event 'welcome'
         socket.on('welcome', function(data) {
-          console.log(data)
-        })
-      })
+          // Log Welcome Message
+          console.log(data);
+          
+          // Emit to Join a Room
+          socket.emit('join-room', '#general');
+        });
+
+        // Listen for Event 'get-message'
+        socket.on('get-message', function(data) {
+          chatWindow.append('<p class="card-text" style="text-align: left">'+data+'</p>');
+        });
+
+        // Set Message Text to Default Focus
+        messageText.focus();
+
+        // Set Message Text Default Action is
+        // to Submit New Message
+        messageText.keypress(function(e) {
+          if (e.which == 13) {
+            e.preventDefault();
+            messageForm.submit();
+          }
+        });
+
+        // Submit New Message
+        messageForm.submit(function(e) {
+          e.preventDefault();
+
+          // Emit a New Message
+          socket.emit('new-message', '#general', messageText.val(), function(result) {
+            // Check If Emit New Message Success
+            if (result) {
+              // If Emit New Message is Success Then
+              // Append New Message to Chat Window
+              chatWindow.append('<p class="card-text" style="text-align: right">'+messageText.val()+'</p>');
+            }
+
+            // Reset Message Text
+            messageText.val('');
+            messageText.height('22px');
+
+            // Reset Focus to Message Text
+            messageText.focus();
+          });
+        });
+      });
     </script>
   </head>
 
-  <body>
-
+  <body style="margin-top: 25px">
+    <div class="container">
+      <div class="row h-100">
+        <div class="col-md-4">
+          <div class="row">
+            <div class="col-md-12">
+              <h4 id="onlineUserCount">Online Users (2)</h4>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <ul class="list-group" id="onlineUserList">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Guest 01
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Guest 02
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="row" style="height: 85% !important">
+            <div class="col-md-12">
+              <div class="card border-secondary mb-3 h-100">
+                <div class="card-header">General Room</div>
+                <div class="card-body" style="overflow: auto !important" id="chatWindow"></div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <form id="messageForm">
+                <div class="form-row">
+                  <div class="col-12">
+                    <br/>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="col-12">
+                    <label>Message:</label>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="col-10">
+                    <textarea class="form-control" rows="1" id="messageText"></textarea>
+                  </div>
+                  <div class="col-2">
+                    <input class="form-control btn btn-success" type="submit" value="Send" id="messageSend">
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
