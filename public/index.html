@@ -44,30 +44,30 @@
         const messageText = $('#messageText');
         const messageSend = $('#messageSend');
         
-        // Listen for Event 'success'
-        socket.on('success', function(data) {
-          // Log Success Message
-          console.log(data);
+        // Listen for Event 'response-success'
+        socket.on('response-success', function(message) {
+          // Log Success Response Message
+          console.log(message);
         });
 
-        // Listen for Event 'failed'
-        socket.on('failed', function(data) {
-          // Alert Failed Message
-          alert(data);
+        // Listen for Event 'response-error'
+        socket.on('response-error', function(message) {
+          // Alert Error Response Message
+          alert(message);
         });
 
         // Listen for Event 'welcome'
-        socket.on('welcome', function(data) {
+        socket.on('welcome', function(message) {
           // Log Welcome Message
-          console.log(data);
+          console.log(message);
           
           // Emit to Join a Room
           socket.emit('join-room', '#general');
         });
 
         // Listen for Event 'get-message'
-        socket.on('get-message', function(data) {
-          chatWindow.append('<p class="card-text" style="text-align: left">'+data+'</p>');
+        socket.on('get-message', function(message) {
+          chatWindow.append('<p class="card-text" style="text-align: left">'+message+'</p>');
         });
 
         // Set Message Text to Default Focus

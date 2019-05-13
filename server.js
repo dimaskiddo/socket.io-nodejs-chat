@@ -45,7 +45,7 @@ io.of('/socket.io/chat').on("connection", function(socket) {
     socket.join(room)
 
     // Return Message to Namespace
-    socket.emit('success', 'You are joined to room: ' + room)
+    socket.emit('response-success', 'You are joined to room: ' + room)
   })
 
   // New Message
@@ -54,7 +54,7 @@ io.of('/socket.io/chat').on("connection", function(socket) {
     if (room === undefined) {
       // If Room is Undefined Then Send Error Message
       result(false)
-      return socket.emit('failed', 'Error, no room defined to send message')
+      return socket.emit('response-error', 'Error, no room defined to send message')
     }
 
     // Check If Socket Joined The Room
@@ -67,7 +67,7 @@ io.of('/socket.io/chat').on("connection", function(socket) {
     }
 
     result(false)
-    socket.emit('failed', 'Error, you are not joined to room ' + room)
+    socket.emit('response-error', 'Error, you are not joined to room ' + room)
   })
 
   // Leave Room
@@ -75,7 +75,7 @@ io.of('/socket.io/chat').on("connection", function(socket) {
     socket.leave(room)
 
     // Return Message to Namespace
-    socket.emit('success', 'You are leaved from room: ' + room)
+    socket.emit('response-success', 'You are leaved from room: ' + room)
   })
 
   // Disconnect
