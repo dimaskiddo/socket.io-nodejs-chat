@@ -99,7 +99,7 @@
           e.preventDefault();
 
           // Emit a New Username
-          socket.emit('new-user', usernameText.val(), function(result) {
+          socket.emit('new-user', usernameText.val().toLowerCase(), function(result) {
             // Check If Emit New Username Success
             if (result) {
               // If Emit New Username is Success Then
@@ -108,7 +108,7 @@
               chatArea.css("display", "flex");
 
               // Set New Username ID
-              usernameID = usernameText.val();
+              usernameID = usernameText.val().toLowerCase();
 
               // Set Focus to Message Text
               messageText.focus();
