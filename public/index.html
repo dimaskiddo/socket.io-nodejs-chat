@@ -2,6 +2,11 @@
   <head>
     <title>NodeJS Socket.IO Chat</title>
     <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+    <style>
+      #chatArea {
+        display: none;
+      }
+    </style>
 
     <script src="https://bootswatch.com/_vendor/jquery/dist/jquery.min.js"></script>
     <script src="https://bootswatch.com/_vendor/popper.js/dist/umd/popper.min.js"></script>
@@ -38,7 +43,14 @@
         // Connect to Socket
         const socket = io.connect("/socket.io/chat", {"path": "/socket.io/chat"});
 
-        // Components
+        // Components User Area
+        const userArea = $('#userArea');
+        const usernameForm = $('#usernameForm');
+        const usernameText = $('#usernameText');
+        var usernameID = "";
+
+        // Components Chat Area
+        const chatArea = $('#chatArea');
         const chatWindow = $('#chatWindow');
         const messageForm = $('#messageForm');
         const messageText = $('#messageText');
@@ -70,8 +82,42 @@
           chatWindow.append('<p class="card-text" style="text-align: left">'+message+'</p>');
         });
 
-        // Set Message Text to Default Focus
-        messageText.focus();
+        // Set Default Focus to Username Text
+        usernameText.focus();
+
+        // Set Username Text Default Action is
+        // to Submit New Username
+        usernameText.keypress(function(e) {
+          if (e.which == 13) {
+            e.preventDefault();
+            usernameForm.submit();
+          }
+        });
+
+        // Submit New Username
+        usernameForm.submit(function(e) {
+          e.preventDefault();
+
+          // Emit a New Username
+          socket.emit('new-user', usernameText.val(), function(result) {
+            // Check If Emit New Username Success
+            if (result) {
+              // If Emit New Username is Success Then
+              // Hide User Area and Show Chat Area
+              userArea.css("display", "none");
+              chatArea.css("display", "flex");
+
+              // Set New Username ID
+              usernameID = usernameText.val();
+
+              // Set Focus to Message Text
+              messageText.focus();
+            }
+
+            // Reset Username Text
+            usernameText.val('');
+          });
+        });
 
         // Set Message Text Default Action is
         // to Submit New Message
@@ -87,12 +133,12 @@
           e.preventDefault();
 
           // Emit a New Message
-          socket.emit('new-message', '#general', messageText.val(), function(result) {
+          socket.emit('new-message', '#general', usernameID+':<br/>'+messageText.val(), function(result) {
             // Check If Emit New Message Success
             if (result) {
               // If Emit New Message is Success Then
               // Append New Message to Chat Window
-              chatWindow.append('<p class="card-text" style="text-align: right">'+messageText.val()+'</p>');
+              chatWindow.append('<p class="card-text" style="text-align: right">'+usernameID+':<br/>'+messageText.val()+'</p>');
             }
 
             // Reset Message Text
@@ -109,7 +155,29 @@
 
   <body style="margin-top: 25px">
     <div class="container">
-      <div class="row h-100">
+      <div class="row h-75" id="userArea">
+        <div class="jumbotron w-100">
+          <h1 class="display-3">Welcome to Simple Chat App!</h1>
+          <p class="lead">This is a simple chat application using Socket.IO on NodeJS as WebSocket implementation.</p>
+          <hr class="my-4">
+
+          <div class="row">
+            <div class="col-md-8">
+              <form id="usernameForm">
+                <div class="form-group">
+                  <label>Please insert a username to begin chat:</label>
+                  <input type="text" class="form-control" placeholder="Username" id="usernameText"/>
+                </div>
+                <input type="submit" value="Let's Chat!" class="btn btn-lg btn-primary"/>
+              </form>
+            </div>
+            <div class="col-md-4">
+              &nbsp;
+            </div>  
+          </div>
+        </div>
+      </div>
+      <div class="row h-100" id="chatArea">
         <div class="col-md-4">
           <div class="row">
             <div class="col-md-12">
@@ -153,10 +221,10 @@
                 </div>
                 <div class="form-row">
                   <div class="col-10">
-                    <textarea class="form-control" rows="1" id="messageText"></textarea>
+                    <textarea rows="1" class="form-control"  id="messageText"></textarea>
                   </div>
                   <div class="col-2">
-                    <input class="form-control btn btn-success" type="submit" value="Send" id="messageSend">
+                    <input type="submit" value="Send" class="form-control btn btn-success" id="messageSend">
                   </div>
                 </div>
               </form>
