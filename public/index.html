@@ -1,7 +1,7 @@
 <html>
   <head>
     <title>NodeJS Socket.IO Chat</title>
-    <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+    <link rel="stylesheet" href="https://bootswatch.com/4/cosmo/bootstrap.min.css">
     <style>
       #chatArea {
         display: none;
@@ -52,6 +52,8 @@
         // Components Chat Area
         const chatArea = $('#chatArea');
         const chatWindow = $('#chatWindow');
+        const onlineUserCount = $('#onlineUserCount');
+        const onlineUserList = $('#onlineUserList');
         const messageForm = $('#messageForm');
         const messageText = $('#messageText');
         const messageSend = $('#messageSend');
@@ -72,15 +74,17 @@
         socket.on('welcome', function(message) {
           // Log Welcome Message
           console.log(message);
-          
-          // Emit to Join a Room
-          socket.emit('join-room', '#general');
         });
 
         // Listen for Event 'get-message'
         socket.on('get-message', function(message) {
           chatWindow.append('<p class="card-text" style="text-align: left">'+message+'</p>');
         });
+
+        // Listen for Event 'get-users'
+        socket.on('get-users', function(users) {
+          onlineUserCount.html('Online Users (' + users.length + ')');
+        })
 
         // Set Default Focus to Username Text
         usernameText.focus();
@@ -101,7 +105,10 @@
           // Emit a New Username
           socket.emit('new-user', usernameText.val().toLowerCase(), function(result) {
             // Check If Emit New Username Success
-            if (result) {
+            if (result) {          
+              // Emit to Join a Room
+              socket.emit('join-room', '#general');
+
               // If Emit New Username is Success Then
               // Hide User Area and Show Chat Area
               userArea.css("display", "none");
@@ -133,12 +140,12 @@
           e.preventDefault();
 
           // Emit a New Message
-          socket.emit('new-message', '#general', usernameID+':<br/>'+messageText.val(), function(result) {
+          socket.emit('new-message', '#general', '<strong>'+usernameID+':</strong><br/>'+messageText.val(), function(result) {
             // Check If Emit New Message Success
             if (result) {
               // If Emit New Message is Success Then
               // Append New Message to Chat Window
-              chatWindow.append('<p class="card-text" style="text-align: right">'+usernameID+':<br/>'+messageText.val()+'</p>');
+              chatWindow.append('<p class="card-text" style="text-align: right"><strong>'+usernameID+':</strong><br/>'+messageText.val()+'</p>');
             }
 
             // Reset Message Text
@@ -181,7 +188,7 @@
         <div class="col-md-4">
           <div class="row">
             <div class="col-md-12">
-              <h4 id="onlineUserCount">Online Users (2)</h4>
+              <h4 id="onlineUserCount"></h4>
             </div>
           </div>
           <div class="row">

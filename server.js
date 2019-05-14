@@ -56,13 +56,19 @@ io.of('/socket.io/chat').on("connection", function(socket) {
     result(true)
     socket.user = user.toLowerCase()
     socketUsers.push(user.toLowerCase())
+
+    // Update Users Data
+    updateUsers()
+
+    // Send Success Response Message
+    socket.emit('response-success', 'You are set as user: ' + user.toLowerCase())
   })
 
   // Join Room
   socket.on('join-room', function(room) {
     socket.join(room.toLowerCase())
 
-    // Return Message to Namespace
+    // Send Success Response Message
     socket.emit('response-success', 'You are joined to room: ' + room.toLowerCase())
   })
 
@@ -92,27 +98,33 @@ io.of('/socket.io/chat').on("connection", function(socket) {
 
   // Leave Room
   socket.on('leave-room', function(room) {
-    socket.leave(room)
+    socket.leave(room.toLowerCase())
 
     // Return Message to Namespace
-    socket.emit('response-success', 'You are leaved from room: ' + room)
+    socket.emit('response-success', 'You are leaved from room: ' + room.toLowerCase())
   })
 
   // Disconnect
   socket.on('disconnect', function(data) {
     // Check If Socket User is Defined
     if (socket.user !== undefined) {
-      // If Socket User is Defined Then
       // Check If Username Already Exist
       if (socketUsers.indexOf(socket.user.toLowerCase()) >= 0) {
         // If Username Already Exist Then Remove The User
         socketUsers.splice(socketUsers.indexOf(socket.user), 1)
+
+        // Update Users Data
+        updateUsers()
       }
     }
 
     socketConns.splice(socketConns.indexOf(socket), 1)
-    console.log('Disconnected: %s Sockets Connected', socketConns.length)
+    console.log('Connected: %s Sockets Connected', socketConns.length)
   })
+
+  function updateUsers() {
+    io.of('/socket.io/chat').emit('get-users', socketUsers)
+  }
 })
 
 
