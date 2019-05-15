@@ -122,7 +122,9 @@ io.of('/socket.io/chat').on("connection", function(socket) {
     console.log('Connected: %s Sockets Connected', socketConns.length)
   })
 
+  // Function Update Users Data
   function updateUsers() {
+    // Broadcast (All Sockets) Update Users Data to Namespace
     io.of('/socket.io/chat').emit('get-users', socketUsers)
   }
 })

@@ -84,6 +84,17 @@
         // Listen for Event 'get-users'
         socket.on('get-users', function(users) {
           onlineUserCount.html('Online Users (' + users.length + ')');
+
+          userLists = '';
+          for(i=0; i<users.length; i++){
+            if (usernameID === users[i]) {
+              userLists += '<li class="list-group-item d-flex justify-content-between align-items-center"><strong>'+users[i]+'</strong></li>';
+            } else {
+              userLists += '<li class="list-group-item d-flex justify-content-between align-items-center">'+users[i]+'</li>';
+            }
+          }
+
+          onlineUserList.html(userLists);
         })
 
         // Set Default Focus to Username Text
@@ -193,14 +204,7 @@
           </div>
           <div class="row">
             <div class="col-md-12">
-              <ul class="list-group" id="onlineUserList">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  Guest 01
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  Guest 02
-                </li>
-              </ul>
+              <ul class="list-group" id="onlineUserList"></ul>
             </div>
           </div>
         </div>
