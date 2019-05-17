@@ -7,6 +7,7 @@ const port = process.env.PORT || 3000
 
 const io = require('socket.io')(server, {
   path: '/socket.io/chat',
+  transports: ['websocket', 'polling'],
   origins: ['*:*']
 })
 
