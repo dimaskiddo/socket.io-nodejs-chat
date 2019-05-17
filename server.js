@@ -11,6 +11,13 @@ const io = require('socket.io')(server, {
   origins: ['*:*']
 })
 
+const ioRedis = require('socket.io-redis')
+io.adapter(ioRedis({
+  host: process.env.SOCKETIO_REDIS_HOST || 'localhost',
+  port: process.env.SOCKETIO_REDIS_PORT || 6379,
+  auth_pass: process.env.SOCKETIO_REDIS_PASS || ''
+}))
+
 
 // -------------------------------------------------
 // Middleware
