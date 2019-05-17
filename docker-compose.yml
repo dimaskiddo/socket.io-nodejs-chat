@@ -15,8 +15,10 @@ services:
     ports:
       - 3000:3000
     environment: 
-      - SOCKETIO_REDIS_HOST=socketio-redis
-      - SOCKETIO_REDIS_PASS=socketio-redis
+      - IO_REDIS_PUB_HOST=socketio-redis
+      - IO_REDIS_PUB_PASSWORD=socketio-redis
+      - IO_REDIS_SUB_HOST=socketio-redis
+      - IO_REDIS_SUB_PASSWORD=socketio-redis
     depends_on:
       - socketio-redis
     restart: always

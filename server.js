@@ -5,6 +5,10 @@ const app = express()
 const server = require('http').createServer(app)
 const port = process.env.PORT || 3000
 
+const redis = require('redis').createClient;
+const redisPub = redis(process.env.IO_REDIS_PUB_PORT || 6379, process.env.IO_REDIS_PUB_HOST || 'localhost', { auth_pass: process.env.IO_REDIS_PUB_PASSWORD || '' })
+const redisSub = redis(process.env.IO_REDIS_SUB_PORT || 6379, process.env.IO_REDIS_SUB_HOST || 'localhost', { auth_pass: process.env.IO_REDIS_SUB_PASSWORD || '' })
+
 const io = require('socket.io')(server, {
   path: '/socket.io/chat',
   transports: ['websocket', 'polling'],
@@ -13,9 +17,8 @@ const io = require('socket.io')(server, {
 
 const ioRedis = require('socket.io-redis')
 io.adapter(ioRedis({
-  host: process.env.SOCKETIO_REDIS_HOST || 'localhost',
-  port: process.env.SOCKETIO_REDIS_PORT || 6379,
-  auth_pass: process.env.SOCKETIO_REDIS_PASS || ''
+  pubClient: redisPub,
+  subClient: redisSub
 }))
 
 
@@ -40,13 +43,8 @@ app.get('/', function(req, res) {
 
 // -------------------------------------------------
 // Sockets
-socketConns = []
-socketUsers = []
-
+var socketUsers = []
 io.of('/socket.io/chat').on("connection", function(socket) {
-  socketConns.push(socket)
-  console.log('Connected: %s Sockets Connected', socketConns.length)
-
   // Welcome
   socket.emit('welcome', 'Welcome to /socket.io/chat Namespace')
 
@@ -63,14 +61,14 @@ io.of('/socket.io/chat').on("connection", function(socket) {
     // Set Username to Socket
     result(true)
     socket.user = user.toLowerCase()
-    socketUsers.push(user.toLowerCase())
 
     // Update Users Data
+    socketUsers.push(socket.user)
     updateUsers()
 
     // Send Success Response Message
-    socket.emit('response-success', 'You are set as user: ' + user.toLowerCase())
-    console.log('User ' + user.toLowerCase() + ' is Connected')
+    socket.emit('response-success', 'You are set as user: ' + socket.user)
+    console.log('User ' + socket.user + ' is Connected')
   })
 
   // Join Room
@@ -124,12 +122,11 @@ io.of('/socket.io/chat').on("connection", function(socket) {
 
         // Update Users Data
         updateUsers()
+
+        // Log Disconnected User
+        console.log('User ' + socket.user + ' is Disconnected')
       }
     }
-
-    socketConns.splice(socketConns.indexOf(socket), 1)
-    console.log('User ' + socket.user.toLowerCase() + ' is Disconnected')
-    console.log('Connected: %s Sockets Connected', socketConns.length)
   })
 
   // Function Update Users Data
