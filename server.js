@@ -70,6 +70,7 @@ io.of('/socket.io/chat').on("connection", function(socket) {
 
     // Send Success Response Message
     socket.emit('response-success', 'You are set as user: ' + user.toLowerCase())
+    console.log('User ' + user.toLowerCase() + ' is Connected')
   })
 
   // Join Room
@@ -127,6 +128,7 @@ io.of('/socket.io/chat').on("connection", function(socket) {
     }
 
     socketConns.splice(socketConns.indexOf(socket), 1)
+    console.log('User ' + socket.user.toLowerCase() + ' is Disconnected')
     console.log('Connected: %s Sockets Connected', socketConns.length)
   })
 

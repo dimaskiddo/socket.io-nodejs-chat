@@ -16,7 +16,6 @@ services:
       - 3000:3000
     environment: 
       - SOCKETIO_REDIS_HOST=socketio-redis
-      - SOCKETIO_REDIS_PORT=6379
       - SOCKETIO_REDIS_PASS=socketio-redis
     depends_on:
       - socketio-redis
