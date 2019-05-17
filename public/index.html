@@ -103,9 +103,12 @@
         // Set Username Text Default Action is
         // to Submit New Username
         usernameText.keypress(function(e) {
-          if (e.which == 13) {
+          if (e.which == 13 && usernameText.val() != "") {
             e.preventDefault();
             usernameForm.submit();
+          } else if (e.which == 13 && usernameText.val() == "") {
+            e.preventDefault();
+            alert('Please insert username first!')
           }
         });
 
@@ -140,9 +143,12 @@
         // Set Message Text Default Action is
         // to Submit New Message
         messageText.keypress(function(e) {
-          if (e.which == 13) {
+          if (e.which == 13 && messageText.val() != "") {
             e.preventDefault();
             messageForm.submit();
+          } else if (e.which == 13 && messageText.val() == "") {
+            e.preventDefault();
+            alert('Please insert message first!')
           }
         });
 

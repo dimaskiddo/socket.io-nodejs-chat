@@ -1,13 +1,12 @@
-const express = require('express')
 const helmet = require('helmet')
-
+const express = require('express')
 const app = express()
-const server = require('http').createServer(app)
-const port = process.env.PORT || 3000
 
-const redis = require('redis').createClient;
-const redisPub = redis(process.env.IO_REDIS_PUB_PORT || 6379, process.env.IO_REDIS_PUB_HOST || 'localhost', { auth_pass: process.env.IO_REDIS_PUB_PASSWORD || '' })
-const redisSub = redis(process.env.IO_REDIS_SUB_PORT || 6379, process.env.IO_REDIS_SUB_HOST || 'localhost', { auth_pass: process.env.IO_REDIS_SUB_PASSWORD || '' })
+const server = require('http').createServer(app)
+const port = process.env.IO_SERVER_PORT || 3000
+
+const redisPub = require('redis').createClient(process.env.IO_REDIS_PUB_PORT || 6379, process.env.IO_REDIS_PUB_HOST || 'localhost', { auth_pass: process.env.IO_REDIS_PUB_PASSWORD || '' })
+const redisSub = require('redis').createClient(process.env.IO_REDIS_SUB_PORT || 6379, process.env.IO_REDIS_SUB_HOST || 'localhost', { auth_pass: process.env.IO_REDIS_SUB_PASSWORD || '' })
 
 const io = require('socket.io')(server, {
   path: '/socket.io/chat',
