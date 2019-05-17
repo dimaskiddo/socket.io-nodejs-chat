@@ -51,7 +51,7 @@ io.of('/socket.io/chat').on("connection", function(socket) {
   // New User
   socket.on('new-user', function(user, result) {
     // Check If Username Already Exist
-    if (socketUsers.indexOf(user.toLowerCase()) >= 0) {
+    if (socketUsers.indexOf(user) >= 0) {
       // If Username Already Exist Send Error Message
       result(false)
       return socket.emit('response-error', 'Error, username already exist')
@@ -60,7 +60,7 @@ io.of('/socket.io/chat').on("connection", function(socket) {
     // If Username not Taken Then
     // Set Username to Socket
     result(true)
-    socket.user = user.toLowerCase()
+    socket.user = user
 
     // Update Users Data
     socketUsers.push(socket.user)
@@ -68,15 +68,15 @@ io.of('/socket.io/chat').on("connection", function(socket) {
 
     // Send Success Response Message
     socket.emit('response-success', 'You are set as user: ' + socket.user)
-    console.log('User ' + socket.user + ' is Connected')
+    console.log('Connected User: ' + socket.user)
   })
 
   // Join Room
   socket.on('join-room', function(room) {
-    socket.join(room.toLowerCase())
+    socket.join(room)
 
     // Send Success Response Message
-    socket.emit('response-success', 'You are joined to room: ' + room.toLowerCase())
+    socket.emit('response-success', 'You are joined to room: ' + room)
   })
 
   // New Message
@@ -89,12 +89,12 @@ io.of('/socket.io/chat').on("connection", function(socket) {
     }
 
     // Check If Socket Joined The Room
-    const roomIndex = Object.keys(socket.rooms).indexOf(room.toLowerCase())
+    const roomIndex = Object.keys(socket.rooms).indexOf(room)
     if (roomIndex > 0) {
       // If Socket is Joined The Room Then
       // Broadcast (Except Current Socket) Message to Room
       result(true)
-      return socket.broadcast.to(room.toLowerCase()).emit('get-message', message)
+      return socket.broadcast.to(room).emit('get-message', message)
     }
 
     // If Socket is Not Joined The Room Then
@@ -124,7 +124,7 @@ io.of('/socket.io/chat').on("connection", function(socket) {
         updateUsers()
 
         // Log Disconnected User
-        console.log('User ' + socket.user + ' is Disconnected')
+        console.log('Disconnected User: ' + socket.user)
       }
     }
   })
