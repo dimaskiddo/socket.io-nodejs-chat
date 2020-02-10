@@ -5,20 +5,22 @@ const app = express()
 const server = require('http').createServer(app)
 const port = process.env.IO_SERVER_PORT || 3000
 
-const redisPub = require('redis').createClient(process.env.IO_REDIS_PUB_PORT || 6379, process.env.IO_REDIS_PUB_HOST || 'localhost', { auth_pass: process.env.IO_REDIS_PUB_PASSWORD || '' })
-const redisSub = require('redis').createClient(process.env.IO_REDIS_SUB_PORT || 6379, process.env.IO_REDIS_SUB_HOST || 'localhost', { auth_pass: process.env.IO_REDIS_SUB_PASSWORD || '' })
-
 const io = require('socket.io')(server, {
   path: '/socket.io/chat',
   transports: ['websocket', 'polling'],
   origins: ['*:*']
 })
 
-const ioRedis = require('socket.io-redis')
-io.adapter(ioRedis({
-  pubClient: redisPub,
-  subClient: redisSub
-}))
+// Uncomment this when using scalable containers
+// This functioning as socket.io pub-sub system
+// const redisPub = require('redis').createClient(process.env.IO_REDIS_PUB_PORT || 6379, process.env.IO_REDIS_PUB_HOST || 'localhost', { auth_pass: process.env.IO_REDIS_PUB_PASSWORD || '' })
+// const redisSub = require('redis').createClient(process.env.IO_REDIS_SUB_PORT || 6379, process.env.IO_REDIS_SUB_HOST || 'localhost', { auth_pass: process.env.IO_REDIS_SUB_PASSWORD || '' })
+
+// const ioRedis = require('socket.io-redis')
+// io.adapter(ioRedis({
+//   pubClient: redisPub,
+//   subClient: redisSub
+// }))
 
 
 // -------------------------------------------------
